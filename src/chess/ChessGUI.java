@@ -16,7 +16,6 @@ class chessBoardPanel extends JButton {
     chessBoardPanel(int i, int j) {
         row = i;
         col = j;
-
     }
 
     public int getRow() {
@@ -29,17 +28,13 @@ class chessBoardPanel extends JButton {
 
     public void setState(chessPiece piece) {
         if (piece instanceof nothing) {
-            setText("");
-        } else if (piece.getPieceColor() == 0) {
-            setText("W." + piece.getPieceType());
-        } else if (piece.getPieceColor() == 1) {
-            setText("B." + piece.getPieceType());
+            setIcon(null);
         } else {
-            setText("");
+            String color = piece.getPieceColor() == 0 ? "White" : "Black";
+            String path = "src\\chess\\image\\"+color+"_" + piece.getPieceType() + ".png";
+            setIcon(new ImageIcon(path));
         }
     }
-
-
 }
 // class ImageLoader {
 //     public static ImageIcon loadImage(String path) {
@@ -82,7 +77,7 @@ class ChessGUI extends JFrame {
                 if ((i + j) % 2 == 0) {
                     BoardGUI[i][j].setBackground(Color.WHITE);
                 } else {
-                    BoardGUI[i][j].setBackground(Color.BLACK);
+                    BoardGUI[i][j].setBackground(new Color(100, 100, 100));
                 }
                 BoardGUI[i][j].addActionListener(new ActionListener() {
 
@@ -99,15 +94,13 @@ class ChessGUI extends JFrame {
                                 col[0] = -1;
                                 row[1] = -1;
                                 col[1] = -1;
-                            }
-
+                            }                                
                         } else {
                             row[1] = panel.getRow();
                             col[1] = panel.getCol();
-                            
                             count++;
                         }
-                        System.out.println("row1: " + row[0] + " col1: " + col[0] + " row2: " + row[1] + " col2: " + col[1]);
+                        System.out.println("\nrow1: " + row[0] + " col1: " + col[0] + " row2: " + row[1] + " col2: " + col[1]);
                     }
                 });
                 chessBoard.add(BoardGUI[i][j]);
@@ -118,9 +111,6 @@ class ChessGUI extends JFrame {
 
 
     }
-
-
-
     JPanel setSidePanel() {
         JPanel sidePanel = new JPanel();
         sidePanel.setPreferredSize(new Dimension(200, 800));
@@ -143,7 +133,10 @@ class ChessGUI extends JFrame {
         return sidePanel;
     }
 
-    public static void main(String[] args) {
+}
+
+class GamePlay extends Thread {
+    public void run() {
         ChessGUI gui = new ChessGUI();
         board game = new board();
         game.setGame();
@@ -152,21 +145,27 @@ class ChessGUI extends JFrame {
                 gui.BoardGUI[i][j].setState(board.chessboard[i][j].getPiece());
             }
         }
-    while (true) {
-        if (gui.count % 2 == 0) {
-
-        gui.BoardGUI[gui.row[0]][gui.col[0]].setState(board.chessboard[gui.row[0]][gui.col[0]].getPiece());
-        gui.BoardGUI[gui.row[1]][gui.col[1]].setState(board.chessboard[gui.row[1]][gui.col[1]].getPiece());
-        gui.row[0] = -1;
-        gui.col[0] = -1;
-        gui.row[1] = -1;
-        gui.col[1] = -1;
-        }
-        try {
-        Thread.sleep(100);
-        } catch (InterruptedException e) {
-        e.printStackTrace();
+        System.out.println("count: " + gui.count);
+        while (true) {
+            
+            try {
+                if (gui.count % 2 == 0&& gui.row[0] != -1 &&gui.row[1] != -1) {{
+                    if(game.MovePiece(gui.row[0], gui.col[0], gui.row[1], gui.col[1])){
+                        gui.BoardGUI[gui.row[1]][gui.col[1]].setState(board.chessboard[gui.row[1]][gui.col[1]].getPiece());
+                        gui.BoardGUI[gui.row[0]][gui.col[0]].setState(board.chessboard[gui.row[0]][gui.col[0]].getPiece());
+                    }
+                }
+                }
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                System.out.println("쓰레드 오류");
+            }
         }
     }
+    public static void main(String[] args) {
+        GamePlay play = new GamePlay();
+        play.start();
     }
 }
+

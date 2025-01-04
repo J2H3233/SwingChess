@@ -96,7 +96,8 @@ class board{
     }
 	
 	boolean changeTurn() {
-		checkTrun = !checkTrun;
+		if(checkTrun == false) checkTrun = true;
+		else checkTrun = false;
 		return checkTrun;
 	}
 	
@@ -127,14 +128,14 @@ class board{
 	}
 	boolean MovePiece(int currentRow, int currentCol, int targetRow, int targetCol) {
 
-        if(!chessboard[currentRow][currentCol].getPiece().rowMagic(currentRow, currentCol, targetRow, targetCol)) {
-            System.out.print("rowMagic에서 false를 반환했습니다.");
-            return false;
-        }
-		// if(chessboard[currentRow][currentCol].getPieceColor() == 1) {
-        //     changeTurn();
-        //     return false;
-        // }
+		if (chessboard[currentRow][currentCol].getPieceColor() != (checkTrun? 1 : 0)) {
+			return false;
+		}
+		changeTurn() ;
+		if (!chessboard[currentRow][currentCol].getPiece().rowMagic(currentRow, currentCol, targetRow, targetCol)) {
+			return false;
+		}
+		
 			
 		if(chessboard[targetRow][targetCol].getPiece() instanceof nothing) {
 			chessPiece temp = chessboard[currentRow][currentCol].getPiece();
