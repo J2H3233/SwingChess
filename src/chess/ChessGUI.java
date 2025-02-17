@@ -9,8 +9,9 @@ import javax.swing.*;
 
 
 class chessBoardPanel extends JButton {
-    private int row;
-    private int col;
+    final private int row;
+    final private int col;
+
     JButton state = new JButton();
 
     chessBoardPanel(int i, int j) {
@@ -42,21 +43,19 @@ class chessBoardPanel extends JButton {
 //     }
 // }
 
-
-
-
 class ChessGUI extends JFrame {
+    final private GameController controller;
     int[] row = {-1,-1};
     int[] col = {-1,-1};
     int count = 0;
 
     chessBoardPanel[][] BoardGUI = new chessBoardPanel[8][8];
-    ChessGUI() {
+    ChessGUI(GameController controller) {
         this.setSize(1000, 800); // 전체 크기를 1000*800으로 변경
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         buildGUI();
         this.setVisible(true);
-        
+        this.controller = controller;
     }
 
     void buildGUI() {
@@ -64,6 +63,7 @@ class ChessGUI extends JFrame {
         mainPanel.add(setChessBoard(), BorderLayout.CENTER);
         mainPanel.add(setSidePanel(), BorderLayout.EAST);
         this.add(mainPanel);
+
     }
 
     JPanel setChessBoard() {
@@ -83,24 +83,26 @@ class ChessGUI extends JFrame {
 
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         chessBoardPanel panel = (chessBoardPanel) e.getSource();
+                        // 버튼 클릭시 보드로 데이터 전송
+                        controller.selectCell(panel.getRow(),panel.getCol());
 
-                        if (count % 2 == 0) {                        
-                            if (!(board.chessboard[panel.getRow()][panel.getCol()].getPiece() instanceof nothing)) {
-                                row[0] = panel.getRow();
-                                col[0] = panel.getCol();
-                                count++;
-                            }else{
-                                row[0] = -1;
-                                col[0] = -1;
-                                row[1] = -1;
-                                col[1] = -1;
-                            }                                
-                        } else {
-                            row[1] = panel.getRow();
-                            col[1] = panel.getCol();
-                            count++;
-                        }
-                        System.out.println("\nrow1: " + row[0] + " col1: " + col[0] + " row2: " + row[1] + " col2: " + col[1]);
+//                        if (count % 2 == 0) {
+//                            if (!(controller.gameboard.chessboard[panel.getRow()][panel.getCol()].getPiece() instanceof nothing)) {
+//                                row[0] = panel.getRow();
+//                                col[0] = panel.getCol();
+//                                count++;
+//                            }else{
+//                                row[0] = -1;
+//                                col[0] = -1;
+//                                row[1] = -1;
+//                                col[1] = -1;
+//                            }
+//                        } else {
+//                            row[1] = panel.getRow();
+//                            col[1] = panel.getCol();
+//                            count++;
+//                        }
+//                        System.out.println("\nrow1: " + row[0] + " col1: " + col[0] + " row2: " + row[1] + " col2: " + col[1]);
                     }
                 });
                 chessBoard.add(BoardGUI[i][j]);
@@ -135,37 +137,4 @@ class ChessGUI extends JFrame {
 
 }
 
-class GamePlay extends Thread {
-    public void run() {
-        ChessGUI gui = new ChessGUI();
-        board game = new board();
-        game.setGame();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                gui.BoardGUI[i][j].setState(board.chessboard[i][j].getPiece());
-            }
-        }
-        System.out.println("count: " + gui.count);
-        while (true) {
-            
-            try {
-                if (gui.count % 2 == 0&& gui.row[0] != -1 &&gui.row[1] != -1) {{
-                    if(game.MovePiece(gui.row[0], gui.col[0], gui.row[1], gui.col[1])){
-                        gui.BoardGUI[gui.row[1]][gui.col[1]].setState(board.chessboard[gui.row[1]][gui.col[1]].getPiece());
-                        gui.BoardGUI[gui.row[0]][gui.col[0]].setState(board.chessboard[gui.row[0]][gui.col[0]].getPiece());
-                    }
-                }
-                }
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.out.println("쓰레드 오류");
-            }
-        }
-    }
-    public static void main(String[] args) {
-        GamePlay play = new GamePlay();
-        play.start();
-    }
-}
 
