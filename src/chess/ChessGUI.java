@@ -51,7 +51,7 @@ class ChessGUI extends JFrame {
 
     chessBoardPanel[][] BoardGUI = new chessBoardPanel[8][8];
     ChessGUI(GameController controller) {
-        this.setSize(1000, 800); // 전체 크기를 1000*800으로 변경
+        this.setSize(800, 800); // 전체 크기를 800*800으로 변경
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         buildGUI();
         this.setVisible(true);
@@ -61,7 +61,7 @@ class ChessGUI extends JFrame {
     void buildGUI() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(setChessBoard(), BorderLayout.CENTER);
-        mainPanel.add(setSidePanel(), BorderLayout.EAST);
+        //mainPanel.add(setSidePanel(), BorderLayout.EAST);
         this.add(mainPanel);
 
     }
@@ -113,27 +113,27 @@ class ChessGUI extends JFrame {
 
 
     }
-    JPanel setSidePanel() {
-        JPanel sidePanel = new JPanel();
-        sidePanel.setPreferredSize(new Dimension(200, 800));
-        sidePanel.setBackground(Color.GRAY);
-        sidePanel.setLayout(new BorderLayout());
-
-        JTextArea messageArea = new JTextArea();
-        messageArea.setEditable(false);
-        sidePanel.add(new JScrollPane(messageArea), BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(1, 2));
-        JButton button1 = new JButton("Button 1");
-        JButton button2 = new JButton("Button 2");
-        buttonPanel.add(button1);
-        buttonPanel.add(button2);
-
-        sidePanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        return sidePanel;
-    }
+//    JPanel setSidePanel() {
+//        JPanel sidePanel = new JPanel();
+//        sidePanel.setPreferredSize(new Dimension(200, 800));
+//        sidePanel.setBackground(Color.GRAY);
+//        sidePanel.setLayout(new BorderLayout());
+//
+//        JTextArea messageArea = new JTextArea();
+//        messageArea.setEditable(false);
+//        sidePanel.add(new JScrollPane(messageArea), BorderLayout.CENTER);
+//
+//        JPanel buttonPanel = new JPanel();
+//        buttonPanel.setLayout(new GridLayout(1, 2));
+//        JButton button1 = new JButton("Button 1");
+//        JButton button2 = new JButton("Button 2");
+//        buttonPanel.add(button1);
+//        buttonPanel.add(button2);
+//
+//        sidePanel.add(buttonPanel, BorderLayout.SOUTH);
+//
+//        return sidePanel;
+//    }
 
 }
 

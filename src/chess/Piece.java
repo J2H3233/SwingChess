@@ -118,25 +118,28 @@ class Pawn extends chessPiece{
         if (!isWithinChessboard(targetRow, targetCol)) {
             return false;
         }
-
+		// 첫 두칸 이동
 		if( isFirstMove() && targetRow - currentRow== 2*direction ) {
 			if (board.chessboard[currentRow + direction][currentCol].getPiece() instanceof nothing && board.chessboard[currentRow + 2*direction][currentCol].getPiece() instanceof nothing)
 					return true;
 			}
-	    // 대각선 이동: 대각선 방향으로 상대방 기물이 있을 경우 이동 가능
-	    if ((targetRow - currentRow) == direction) { 
-	    	
-	    	if(Math.abs(currentCol - targetCol) == 1) {
-	    		if (!(board.chessboard[targetRow][targetCol].getPiece() instanceof nothing) && board.chessboard[targetRow][targetCol].getPieceColor() != this.getPieceColor()) {
-		            // 상대편 기물이 있을 때만 대각선 이동 가능
-		                return true;
-		        }	
-	    	}else if(currentCol == targetCol && board.chessboard[targetRow][targetCol].getPiece() instanceof nothing)
-	    		return true;
-	    }
+		// 대각 공격
+		if(pawnAttack(currentRow, currentCol, targetRow, targetCol)){
+			return true;
+		}
+		// 일반 이동
+        return (targetRow - currentRow) == direction && currentCol == targetCol && board.chessboard[targetRow][targetCol].getPiece() instanceof nothing;
+    }
+	boolean pawnAttack(int currentRow, int currentCol, int targetRow, int targetCol) {
+
+		// 대각선 이동: 대각선 방향으로 상대방 기물이 있을 경우 이동 가능
+		if ((targetRow - currentRow) == direction) {
+			if(Math.abs(currentCol - targetCol) == 1) {// 상대편 기물이 있을 때만 대각선 이동 가능
+                return !(board.chessboard[targetRow][targetCol].getPiece() instanceof nothing) && board.chessboard[targetRow][targetCol].getPieceColor() != this.getPieceColor();
+			}
+		}
 		return false;
 	}
-
 }
 class King extends chessPiece{
 
@@ -148,85 +151,82 @@ class King extends chessPiece{
 		if (!isWithinChessboard(targetRow, targetCol)) 
 			return false;
 		if (Math.abs(currentRow - targetRow) <= 1 && Math.abs(currentCol - targetCol) <= 1 && blockSameColor(currentRow, currentCol, targetRow, targetCol)) {
-			if (isAttackedKnight(targetRow, targetCol) || isAttackedRook(targetRow, targetCol) || isAttackedBishop(targetRow, targetCol)) {
-				System.out.println(targetRow + "," + targetCol + "이동은 킹이 위험합니다");
-				return false;
-			}
+//			if (isAttackedKnight(targetRow, targetCol) || isAttackedRook(targetRow, targetCol) || isAttackedBishop(targetRow, targetCol)) {
+//				System.out.println(targetRow + "," + targetCol + "이동은 킹이 위험합니다");
+//				return false;
+//			}
 			return true;
 		}
 		return false;
 	}
-	boolean isAttackedKnight(int targetRow, int targetCol) {
-		int[][] knightMoves = {
-			{2, 1}, {2, -1}, {-2, 1}, {-2, -1},
-			{1, 2}, {1, -2}, {-1, 2}, {-1, -2}
-		};
 
-		for (int[] move : knightMoves) {
-			int newRow = targetRow + move[0];
-			int newCol = targetCol + move[1];
-
-			if (isWithinChessboard(newRow, newCol)) {
-				chessPiece piece = board.chessboard[newRow][newCol].getPiece();
-				if (piece instanceof Knight && piece.getPieceColor() != this.getPieceColor()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	boolean isAttackedRook(int targetRow, int targetCol) {
-		int[][] directions = {
-			{1, 0}, {-1, 0}, {0, 1}, {0, -1}
-		};
-
-		for (int[] direction : directions) {
-			int newRow = targetRow + direction[0];
-			int newCol = targetCol + direction[1];
-
-			while (isWithinChessboard(newRow, newCol)) {
-				chessPiece piece = board.chessboard[newRow][newCol].getPiece();
-				if (!(piece instanceof nothing)) {
-					if (piece.getPieceColor() != this.getPieceColor() && (piece instanceof Rook || piece instanceof Queen)) {
-						return true;
-					} else {
-						break;
-					}
-				}
-				newRow += direction[0];
-				newCol += direction[1];
-			}
-		}
-		return false;
-	}
-	boolean isAttackedBishop(int targetRow, int targetCol) {
-		int[][] directions = {
-			{1, 1}, {1, -1}, {-1, 1}, {-1, -1}
-		};
-
-		for (int[] direction : directions) {
-			int newRow = targetRow + direction[0];
-			int newCol = targetCol + direction[1];
-
-			while (isWithinChessboard(newRow, newCol)) {
-				chessPiece piece = board.chessboard[newRow][newCol].getPiece();
-				if (!(piece instanceof nothing)) {
-					if (piece.getPieceColor() != this.getPieceColor() && (piece instanceof Bishop || piece instanceof Queen)) {
-						return true;
-					} else {
-						break;
-					}
-				}
-				newRow += direction[0];
-				newCol += direction[1];
-			}
-		}
-		return false;
-	}
-
-
-
-
+//	boolean isAttackedKnight(int targetRow, int targetCol) {
+//		int[][] knightMoves = {
+//			{2, 1}, {2, -1}, {-2, 1}, {-2, -1},
+//			{1, 2}, {1, -2}, {-1, 2}, {-1, -2}
+//		};
+//
+//		for (int[] move : knightMoves) {
+//			int newRow = targetRow + move[0];
+//			int newCol = targetCol + move[1];
+//
+//			if (isWithinChessboard(newRow, newCol)) {
+//				chessPiece piece = board.chessboard[newRow][newCol].getPiece();
+//				if (piece instanceof Knight && piece.getPieceColor() != this.getPieceColor()) {
+//					return true;
+//				}
+//			}
+//		}
+//		return false;
+//	}
+//	boolean isAttackedRook(int targetRow, int targetCol) {
+//		int[][] directions = {
+//			{1, 0}, {-1, 0}, {0, 1}, {0, -1}
+//		};
+//
+//		for (int[] direction : directions) {
+//			int newRow = targetRow + direction[0];
+//			int newCol = targetCol + direction[1];
+//
+//			while (isWithinChessboard(newRow, newCol)) {
+//				chessPiece piece = board.chessboard[newRow][newCol].getPiece();
+//				if (!(piece instanceof nothing)) {
+//					if (piece.getPieceColor() != this.getPieceColor() && (piece instanceof Rook || piece instanceof Queen)) {
+//						return true;
+//					} else {
+//						break;
+//					}
+//				}
+//				newRow += direction[0];
+//				newCol += direction[1];
+//			}
+//		}
+//		return false;
+//	}
+//	boolean isAttackedBishop(int targetRow, int targetCol) {
+//		int[][] directions = {
+//			{1, 1}, {1, -1}, {-1, 1}, {-1, -1}
+//		};
+//
+//		for (int[] direction : directions) {
+//			int newRow = targetRow + direction[0];
+//			int newCol = targetCol + direction[1];
+//
+//			while (isWithinChessboard(newRow, newCol)) {
+//				chessPiece piece = board.chessboard[newRow][newCol].getPiece();
+//				if (!(piece instanceof nothing)) {
+//					if (piece.getPieceColor() != this.getPieceColor() && (piece instanceof Bishop || piece instanceof Queen)) {
+//						return true;
+//					} else {
+//						break;
+//					}
+//				}
+//				newRow += direction[0];
+//				newCol += direction[1];
+//			}
+//		}
+//		return false;
+//	}
 }
 
 class Rook extends chessPiece implements rookMoveCheck{

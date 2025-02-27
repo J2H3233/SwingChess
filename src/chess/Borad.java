@@ -119,68 +119,196 @@ class board {
         setPiece(new King(this, 1), 0, 4);
     }
 
+    boolean isKingInCheck(int kingRow, int kingCol, int attackerColor) {
+        // 체스판 전체를 순회하며 상대 기물이 우리 킹을 공격할 수 있는지 확인
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                chessPiece piece = chessboard[i][j].getPiece();
+                if (piece instanceof nothing) continue; // 빈칸은 무시
+                if (piece.getPieceColor() == attackerColor) { // 적 기물만 검사
+                    if (piece instanceof Pawn) {
+                        if (((Pawn) piece).pawnAttack(i, j, kingRow, kingCol)) {
+                            return true;
+                        }
+                    } else {
+                        if (piece.rowMagic(i, j, kingRow, kingCol)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+//
+//    boolean isCheckmate(int kingRow, int kingCol, int kingColor) {
+//        if (!isKingInCheck(kingRow, kingCol, kingColor == 1 ? 0 : 1)) {
+//            return false; // 킹이 체크 상태가 아니면 체크메이트가 아님
+//        }
+//
+//        // 1️⃣ 킹이 이동할 수 있는지 확인
+//        int[] dRow = {-1, -1, -1, 0, 0, 1, 1, 1};
+//        int[] dCol = {-1, 0, 1, -1, 1, -1, 0, 1};
+//
+//        for (int d = 0; d < 8; d++) {
+//            int newRow = kingRow + dRow[d];
+//            int newCol = kingCol + dCol[d];
+//
+//            if (isValidPosition(newRow, newCol) &&
+//                    (chessboard[newRow][newCol].getPiece() instanceof nothing ||
+//                            chessboard[newRow][newCol].getPiece().getPieceColor() != kingColor)) {
+//
+//                // 이동 후 체크 상태인지 확인
+//                chessPiece original = chessboard[newRow][newCol].getPiece();
+//                chessboard[newRow][newCol].setPiece(chessboard[kingRow][kingCol].getPiece());
+//                chessboard[kingRow][kingCol].setPiece(new nothing(this));
+//
+//                boolean stillInCheck = isKingInCheck(newRow, newCol, kingColor == 1 ? 0 : 1);
+//
+//                // 원상 복구
+//                chessboard[kingRow][kingCol].setPiece(chessboard[newRow][newCol].getPiece());
+//                chessboard[newRow][newCol].setPiece(original);
+//
+//                if (!stillInCheck) return false; // 킹이 도망칠 수 있으면 체크메이트가 아님
+//            }
+//        }
+//
+//        // 2️⃣ 공격하는 기물을 찾아서 잡을 수 있는지 확인
+//        int attackerRow = -1, attackerCol = -1;
+//        for (int i = 0; i < 8; i++) {
+//            for (int j = 0; j < 8; j++) {
+//                if (chessboard[i][j].getPiece().rowMagic(i, j, kingRow, kingCol)) {
+//                    attackerRow = i;
+//                    attackerCol = j;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        if (attackerRow != -1 && attackerCol != -1) {
+//            for (int i = 0; i < 8; i++) {
+//                for (int j = 0; j < 8; j++) {
+//                    if (chessboard[i][j].getPiece().getPieceColor() == kingColor &&
+//                            chessboard[i][j].getPiece().rowMagic(i, j, attackerRow, attackerCol)) {
+//                        return false; // 공격하는 기물을 잡을 수 있으면 체크메이트가 아님
+//                    }
+//                }
+//            }
+//        }
+//
+//        // 3️⃣ 공격하는 기물의 경로를 차단할 수 있는지 확인 (퀸, 룩, 비숍만 해당)
+//        if (chessboard[attackerRow][attackerCol].getPiece() instanceof Queen ||
+//                chessboard[attackerRow][attackerCol].getPiece() instanceof Rook ||
+//                chessboard[attackerRow][attackerCol].getPiece() instanceof Bishop) {
+//
+//            int dirRow = (kingRow > attackerRow) ? 1 : (kingRow < attackerRow) ? -1 : 0;
+//            int dirCol = (kingCol > attackerCol) ? 1 : (kingCol < attackerCol) ? -1 : 0;
+//
+//            int blockRow = attackerRow + dirRow;
+//            int blockCol = attackerCol + dirCol;
+//
+//            while (blockRow != kingRow || blockCol != kingCol) {
+//                for (int i = 0; i < 8; i++) {
+//                    for (int j = 0; j < 8; j++) {
+//                        if (chessboard[i][j].getPiece().getPieceColor() == kingColor &&
+//                                chessboard[i][j].getPiece().rowMagic(i, j, blockRow, blockCol)) {
+//                            return false; // 공격 경로를 차단할 수 있으면 체크메이트가 아님
+//                        }
+//                    }
+//                }
+//                blockRow += dirRow;
+//                blockCol += dirCol;
+//            }
+//        }
+//
+//        // 🏆 위 모든 방법이 실패했다면 체크메이트!
+//        return true;
+//    }
+
+
+    // 유효한 체스판 위치인지 확인
+    boolean isValidPosition(int row, int col) {
+        return row >= 0 && row < 8 && col >= 0 && col < 8;
+    }
+
+
     boolean MovePiece(int currentRow, int currentCol, int targetRow, int targetCol) {
-        // 본인턴인지 확인
+        chessPiece temp = null;
+
+        // 본인 턴 확인
         if (chessboard[currentRow][currentCol].getPieceColor() != (checkTurn ? 1 : 0)) {
             return false;
         }
-        // 기물에 따른 적합한 이동인지 확인
+
+        // 이동 가능 여부 확인
         if (!chessboard[currentRow][currentCol].getPiece().rowMagic(currentRow, currentCol, targetRow, targetCol)) {
             return false;
         }
-        // 기물이 킹일 경우 이동시 체크메이트인지 확인, 체크일 경우 이동을 중지
-        if (chessboard[currentRow][currentCol].getPiece() instanceof King) {
 
-        }
-
-        // 기물이 킹이 아닐 경우 기물이 움직이면 같은 색 킹이 체크메이트 인지 확인
-        // 이동이 적합함을 확정하고 턴을 변경
-        changeTurn();
+        // 기물 이동
         if (chessboard[targetRow][targetCol].getPiece() instanceof nothing) {
-            chessPiece temp = chessboard[currentRow][currentCol].getPiece();
+            temp = chessboard[currentRow][currentCol].getPiece();
             chessboard[currentRow][currentCol].setPiece(chessboard[targetRow][targetCol].getPiece());
             chessboard[targetRow][targetCol].setPiece(temp);
         } else {
             chessboard[targetRow][targetCol].setPiece(chessboard[currentRow][currentCol].getPiece());
             chessboard[currentRow][currentCol].setPiece(new nothing(this));
         }
-        // 이동이 이뤄진 후 상대 킹이 체크 상태인지 확인
-        // 체크 상태인 경우 체크 상태에서 벗어날 수 있는지 확인, 안될 경우 체크메이트에 의한 게임 종료
 
-        return true;
-    }
-
-    boolean checkCheck(){
-
-        int myKingRow=-1, myKingCol=-1;
-        int yourKingRow=-1, yourKingCol=-1;
-        for(int i=0; i<8;i++){
-            for(int j=0; j<8;j++){
-                if(chessboard[i][j].getPiece() instanceof King){
-                    if(chessboard[i][j].getPieceColor() == (checkTurn ? 1:0)){
-                        myKingRow = i;
-                        myKingCol = j;
-                    }else if(chessboard[i][j].getPieceColor() != (checkTurn ? 1:0)){
-                        yourKingRow = i;
-                        yourKingCol = j;
-                    }
+        // 내 킹 위치 찾기
+        int myKingRow = -1, myKingCol = -1;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (chessboard[i][j].getPiece() instanceof King
+                        && chessboard[i][j].getPieceColor() == (checkTurn ? 1 : 0)) {
+                    myKingRow = i;
+                    myKingCol = j;
                 }
             }
         }
 
-//        for(int i=0; i<8;i++){
-//            for(int j=0; j<8;j++){
-//                if(chessboard[i][j].getPieceColor() != chessboard[myKingCol][myKingRow].getPieceColor()){
-//                    chessboard[i][j].getPiece().rowMagic(i,j,myKingCol,myKingRow);
-//                }
-//            }
-//        }
+
+
+        if(isKingInCheck(myKingRow,myKingCol,(checkTurn ? 0 : 1))){
+            if (chessboard[currentRow][currentCol].getPiece() instanceof nothing) {
+                temp = chessboard[targetRow][targetCol].getPiece();
+                chessboard[targetRow][targetCol].setPiece(chessboard[currentRow][currentCol].getPiece());
+                chessboard[currentRow][currentCol].setPiece(temp);
+            } else {
+                chessboard[currentRow][currentCol].setPiece(chessboard[targetRow][targetCol].getPiece());
+                chessboard[targetRow][targetCol].setPiece(new nothing(this));
+            }
+            System.out.println("내 킹이 체크 입니다.");
+            return true;
+        }
+
+
+
+
+        // 턴 변경
+        changeTurn();
+
+        int yourKingRow = -1, yourKingCol = -1;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (chessboard[i][j].getPiece() instanceof King
+                        && chessboard[i][j].getPieceColor() == (checkTurn ? 1 : 0)) {
+                    yourKingRow = i;
+                    yourKingCol = j;
+                }
+            }
+        }
+
+        if(isKingInCheck(yourKingRow,yourKingCol,(checkTurn ? 0 : 1))){
+
+            System.out.println("상대 킹이 체크 입니다.");
+        }
 
         return true;
     }
 
-}
 
+}
 
 
 
