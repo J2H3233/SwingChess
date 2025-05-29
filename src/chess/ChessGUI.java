@@ -7,43 +7,13 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 
-
-class chessBoardPanel extends JButton {
-    final private int row;
-    final private int col;
-
-    JButton state = new JButton();
-
-    chessBoardPanel(int i, int j) {
-        row = i;
-        col = j;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
-    }
-
-    public void setState(chessPiece piece) {
-        if (piece instanceof nothing) {
-            setIcon(null);
-        } else {
-            String color = piece.getPieceColor() == 0 ? "White" : "Black";
-            String path = "src\\chess\\image\\"+color+"_" + piece.getPieceType() + ".png";
-            setIcon(new ImageIcon(path));
-        }
-    }
-}
 // class ImageLoader {
 //     public static ImageIcon loadImage(String path) {
 //         return new ImageIcon(path);
 //     }
 // }
 
-class ChessGUI extends JFrame {
+public class ChessGUI extends JFrame {
     final private GameController controller;
     int[] row = {-1,-1};
     int[] col = {-1,-1};
@@ -87,7 +57,7 @@ class ChessGUI extends JFrame {
                         controller.selectCell(panel.getRow(),panel.getCol());
 
 //                        if (count % 2 == 0) {
-//                            if (!(controller.gameboard.chessboard[panel.getRow()][panel.getCol()].getPiece() instanceof nothing)) {
+//                            if (!(controller.gameboard.chessboard[panel.getRow()][panel.getCol()].getPiece() instanceof nothing.java)) {
 //                                row[0] = panel.getRow();
 //                                col[0] = panel.getCol();
 //                                count++;

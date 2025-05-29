@@ -1,14 +1,16 @@
 package chess;
 
-class GameController {
-    private board gameboard;
+import chess.piece.nothing;
+
+public class GameController {
+    private Board gameboard;
     private ChessGUI gui;
     private int[] selectedRow = {-1, -1};
     private int[] selectedCol = {-1, -1};
     private int count = 0;
 
     GameController() {
-        gameboard = new board();
+        gameboard = new Board();
         gameboard.initialize();
         gameboard.setGame();
         gui = new ChessGUI(this);
